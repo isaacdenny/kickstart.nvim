@@ -25,6 +25,7 @@ vim.opt.mouse = 'a'
 vim.opt.showmode = false
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
+
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  Remove this option if you want your OS clipboard to remain independent.
@@ -102,6 +103,9 @@ end, { desc = 'Insert HTML boilerplate' })
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+-- Gitsigns
+vim.keymap.set('n', '<leader>g', '<cmd>Gitsigns<CR>', { desc = '[G]itsigns' })
+
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
@@ -115,6 +119,11 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
+
+-- Remove weird clipboard overwrite when pasting in visual mode
+vim.keymap.set('x', 'p', function()
+  return 'pgv"' .. vim.v.register .. 'y'
+end, { remap = false, expr = true })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
@@ -348,9 +357,10 @@ require('lazy').setup({
 
       local servers = {
         clangd = {},
-        eslint_d = {},
-        gopls = {},
+        -- eslint_d = {},
+        -- gopls = {},
         -- pyright = {},
+        ts_ls = {},
         rust_analyzer = {},
         prettier = {},
         lua_ls = {
@@ -618,22 +628,18 @@ require('lazy').setup({
     --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
-  --{
-  --  'isaacdenny/conways-gol.nvim',
-  --  dev = true,
-  --  config = function()
-  --    require('conways-gol').setup()
-  --  end,
-  --},
-
-  -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
-  -- init.lua. If you want these files, they are in the repository, so you can just download them and
-  -- place them in the correct locations.
+  {
+    'isaacdenny/commander.nvim',
+    dev = true,
+    config = function()
+      require('commander').setup()
+    end,
+  },
 
   --  { import = 'custom.plugins' },
 }, {
   dev = {
-    path = '~/Projects',
+    path = '~/projects',
   },
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
